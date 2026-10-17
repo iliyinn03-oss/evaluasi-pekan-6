@@ -87,4 +87,95 @@ const transaksiMentah = [
   },
 ];
 
+function bersihkanNama(teks) {
+  return teks
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase()
+    .replace(/\b\p{L}/gu, (huruf) => huruf.toUpperCase());
+}
 
+const ubahKeAngka = function (teks) {
+  const angka = Number(teks.replaceAll(".", "").replaceAll(" ", ""));
+  return Number.isFinite(angka) ? angka : 0;
+};
+
+const ambilPersenVoucher = (kode) => {
+  const kodeBersih = kode.trim().toUpperCase();
+  if (!kodeBersih.startsWith("DISKON")) {
+    return 0;
+  }
+  const persen = Number(kodeBersih.slice("DISKON".length));
+  return Number.isFinite(persen) ? persen : 0;
+};
+
+function formatRupiah(angka) {
+  const nilaiBulat = Math.round(angka);
+  const teksAngka = String(Math.abs(nilaiBulat));
+  let hasil = "";
+
+  for (let i = 0; i < teksAngka.length; i++) {
+    if (i > 0 && (teksAngka.length - i) % 3 === 0) {
+      hasil += ".";
+    }
+    hasil += teksAngka[i];
+  }
+
+  return `Rp ${nilaiBulat < 0 ? "-" : ""}${hasil}`;
+}
+
+console.log("Uji function pembersih (input → hasil):");
+const ujiNama = ["  rina   WULANDARI ", "", "  kopi SUSU  "];
+for (const input of ujiNama) {
+  console.log(JSON.stringify(input), "→", JSON.stringify(bersihkanNama(input)));
+}
+const ujiAngka = ["150.000", "75000", "abc"];
+for (const input of ujiAngka) {
+  console.log(JSON.stringify(input), "→", ubahKeAngka(input));
+}
+const ujiVoucher = [" diskon10 ", "PROMO5", ""];
+for (const input of ujiVoucher) {
+  console.log(JSON.stringify(input), "→", ambilPersenVoucher(input));
+}
+for (const input of [1250000, 500, 0]) {
+  console.log(input, "→", formatRupiah(input));
+}
+
+const transaksiBersih = [];
+for (const transaksi of transaksiMentah) {
+  const pesananBersih = [];
+  for (const item of transaksi.pesanan) {
+    pesananBersih.push({
+      menu: bersihkanNama(item.menu),
+      jumlah: ubahKeAngka(item.jumlah),
+    });
+  }
+
+  transaksiBersih.push({
+    kode: transaksi.kode.toUpperCase(),
+    pelanggan: bersihkanNama(transaksi.pelanggan),
+    hari: transaksi.hari.trim().replace(/\s+/g, " ").toLowerCase(),
+    uangBayar: ubahKeAngka(transaksi.uangBayar),
+    persenVoucher: ambilPersenVoucher(transaksi.voucher),
+    pesanan: pesananBersih,
+  });
+}
+
+console.log("\nTransaksi bersih:", transaksiBersih);
+
+/*
+  Jawaban bagian 2:
+  - parseInt membaca bilangan bulat dari awal teks; parseFloat membaca bilangan
+    desimal; Number mengubah seluruh teks menjadi angka dan menolak teks tambahan.
+  - Titik pada "150.000" adalah pemisah ribuan, bukan tanda desimal. Titik harus
+    dihapus dahulu agar Number menghasilkan 150000. parseInt("150.000") menghasilkan 150.
+  - toFixed mengembalikan string. Contoh: typeof (12.3).toFixed(1) adalah "string".
+    Karena itu "12.3" + 1 menghasilkan "12.31", bukan 13.3.
+  - replace mengganti kecocokan pertama, sedangkan replaceAll mengganti semuanya.
+    ubahKeAngka memakai replaceAll untuk membuang seluruh titik dan spasi.
+  - toUpperCase menghasilkan string baru; string tidak berubah di tempat, jadi
+    nilai asli kode tetap sama kecuali hasilnya disimpan kembali.
+  - Declaration: bersihkanNama (dideklarasikan sebagai function dan cocok dipakai
+    langsung sebagai helper bernama). Expression: ubahKeAngka (nilai function
+    disimpan ke const). Arrow: ambilPersenVoucher (callback/proses pendek).
+*/
