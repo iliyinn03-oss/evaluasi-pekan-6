@@ -85,3 +85,17 @@ for (const n of [2, 17, 15, 1, 0]) {
 }
 
 
+/*
+  Langkah demi langkah hitungFaktorial(5):
+  hasil mulai 1; i=2 menghasilkan 2; i=3 menghasilkan 6; i=4 menghasilkan 24;
+  i=5 menghasilkan 120; loop berhenti ketika i menjadi 6 dan function mengembalikan 120.
+  hapusDuplikat membaca array asli saja dan menambahkan nilai baru ke array hasil.
+  includes dipilih karena langsung menjawab apakah nilai sudah pernah ditambahkan.
+  cekBilanganPrima memakai break? Tidak, return false langsung mengakhiri function
+  ketika ditemukan pembagi. Tanpa penghentian awal, jawaban tetap benar tetapi loop
+  akan terus menguji pembagi yang tidak diperlukan.
+  cariTerbesar([]) mengembalikan null karena tidak ada nilai/indeks terbesar; 0 akan
+  salah memberi kesan bahwa ada nilai nol di array.
+  hitungFaktorial memakai for karena batas putaran diketahui; hitungVokal memakai
+  for...of karena ingin memeriksa tiap karakter tanpa mengelola indeks.
+*/
