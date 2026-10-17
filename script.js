@@ -399,3 +399,17 @@ const kasir = {
     secara langsung dan tetap menyimpan sisa yang tak terpecah.
 */
 
+const TARGET_KAS = 1000000000;
+for (const transaksi of transaksiBersih) {
+  const hasil = kasir.prosesTransaksi(transaksi);
+  kasir.cetakStruk(hasil);
+  if (kasir.saldoKas >= TARGET_KAS) {
+    console.log("Target kas tercapai");
+    break;
+  }
+}
+console.log("\nSaldo kas:", formatRupiah(kasir.saldoKas));
+// Untuk uji kedua, ubah TARGET_KAS menjadi 50000 dan muat ulang halaman.
+// TRX-002 adalah transaksi terakhir yang diproses pada percobaan kedua.
+// Nilai TARGET_KAS dikembalikan ke 1000000000 untuk hasil akhir.
+//
