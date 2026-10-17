@@ -96,3 +96,31 @@ for (let kunci in harga) {
   console.log(kunci + ": " + harga[kunci]);
 }
 
+/*
+  Catatan Bug:
+  1. Menghentikan program dengan ReferenceError: saldo tanpa this merujuk variabel yang tidak ada
+     (saat method dipanggil akan menjadi ReferenceError; program berhenti).
+  2. Tidak error tetapi hasil salah: <= menjalankan satu putaran tambahan.
+  3. Tidak error tetapi hasil salah: putaran tambahan membaca keranjang[length] yang undefined.
+  4. Tidak error tetapi hasil salah: syarat >=25000 menangkap subtotal 50000 lebih dahulu.
+  5. Tidak error tetapi hasil salah: fall-through membuat promo Jumat tertimpa 5000.
+  6. Tidak error tetapi hasil salah: tanpa tanda kurung pajak hanya dikenakan pada promo.
+  7. Tidak error tetapi hasil salah: parseInt("100.000") membaca prefix 100.
+  8. Tidak error tetapi hasil salah: = menetapkan total ke uangBayar dan mengecek truthy,
+     bukan membandingkan apakah uangBayar mencukupi total.
+  9. Tidak error tetapi hasil salah: slice(0) menambahkan nama dari karakter pertama lagi.
+  10. Tidak error tetapi hasil salah: slice tidak mengubah array keranjang.
+  11. Tidak error tetapi hasil salah: unshift menambahkan "air" di awal, bukan di akhir.
+  12. Tidak error tetapi hasil salah: string "5" + angka 1 menghasilkan "51".
+  13. Tidak error tetapi hasil salah: string hasil toFixed digabung dengan 10, bukan dijumlahkan.
+  14. Tidak error tetapi hasil salah: function selesai dengan nilai undefined karena return hilang.
+  15. Menghentikan program dengan TypeError: object harga bukan iterable untuk for...of.
+
+  Lima belas perbaikan menandai setiap perilaku salah yang tampak, termasuk dua akibat
+  berbeda dari loop berlebih: iterasi ekstra dan pembacaan keranjang[length].
+
+  if (uangBayar = total) tidak error karena assignment adalah ekspresi JavaScript yang
+  menghasilkan nilai yang ditetapkan; uangBayar akan berubah menjadi total. parseInt
+  membaca bilangan bulat dari awal teks dan berhenti pada titik, sehingga "100.000"
+  dibaca sebagai 100; titik ribuan harus dihapus sebelum konversi.
+*/
