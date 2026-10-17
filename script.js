@@ -384,4 +384,18 @@ const kasir = {
   },
 };
 
-git 
+/*
+  Jawaban bagian 3:
+  - this.menu menunjuk menu milik object kasir yang sedang menjalankan method.
+  - switch cocok untuk memilih satu nilai hari. Case sabtu sengaja dilanjutkan
+    ke minggu tanpa break agar kedua hari mendapat promo Rp 5.000.
+  - !trx.pesanan.length benar saat panjang array 0. Contoh nilai falsy: false, 0, "".
+  - break menghentikan loop (misalnya saat target kas tercapai); continue hanya
+    melewati item loop sekarang (misalnya pesanan tidak valid).
+  - hitungSubtotal mengembalikan subtotal dan kedua daftar item supaya bagian
+    transaksi dan struk bisa menggunakan hasil validasi yang sama.
+  - for...of mengunjungi tiap pecahan; while mengambil pecahan yang sama berulang.
+    Pembagian dan modulo bisa dipakai, tetapi loop ini menunjukkan banyak lembar
+    secara langsung dan tetap menyimpan sisa yang tak terpecah.
+*/
+
