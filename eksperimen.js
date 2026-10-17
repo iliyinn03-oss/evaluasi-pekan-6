@@ -132,3 +132,18 @@ for (const nilai of nilaiTruthy) {
   }
 }
 
+/*
+  BAGIAN 7.3: JELASKAN
+  - Dalam "10" + 5 * 2, perkalian dikerjakan lebih dahulu: 5 * 2 menjadi 10.
+    Kemudian + bertemu string, maka angka 10 dikonversi ke teks dan digabung menjadi "1010".
+  - slice menghasilkan array baru tanpa mengubah angka; splice menghapus elemen dari
+    array asli dan sekaligus mengembalikan elemen yang terhapus. Karena dipanggil setelah
+    slice, kedua hasil berisi [20, 30], tetapi angka akhirnya [10, 40].
+  - cetak(4) menjalankan console.log internal yang mencetak 8. Function tidak punya
+    return, jadi hasil pemanggilan adalah undefined dan console.log luar mencetaknya.
+  - Pada Potongan C: i=1 ditambahkan; i=2 dilewati oleh continue; i=3 ditambahkan;
+    i=4 ditambahkan; i=5 menghentikan loop dengan break sebelum ditambahkan; i=6 tak
+    pernah dijalankan. Maka hasilnya "134".
+  - do...while menjalankan blok dahulu, baru memeriksa kondisi. x berubah dari 0 ke 5,
+    lalu x < 3 false sehingga loop berhenti setelah satu putaran.
+*/
