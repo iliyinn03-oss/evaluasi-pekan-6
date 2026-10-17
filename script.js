@@ -4,7 +4,8 @@
   Tujuan: Membersihkan data formulir Kedai Senja, memproses transaksi,
   menghitung pembayaran, dan membuat laporan penjualan harian.
 */
- // BAGIAN 2: DATA DAN PEMBERSIHAN DATA
+
+// BAGIAN 2: DATA DAN PEMBERSIHAN DATA
 const kedai = {
   nama: "Kedai Senja",
   pemilik: "Illiyin Auro",
@@ -179,3 +180,208 @@ console.log("\nTransaksi bersih:", transaksiBersih);
     langsung sebagai helper bernama). Expression: ubahKeAngka (nilai function
     disimpan ke const). Arrow: ambilPersenVoucher (callback/proses pendek).
 */
+
+// BAGIAN 3: MESIN KASIR
+const kasir = {
+  menu: menu,
+  saldoKas: 0,
+  riwayat: [],
+  pecahan: [50000, 20000, 10000, 5000, 2000, 1000],
+
+  cariMenu(nama) {
+    for (const item of this.menu) {
+      if (item.nama.toLowerCase() === nama.toLowerCase()) {
+        return item;
+      }
+    }
+    return null;
+  },
+
+  hitungSubtotal(pesanan) {
+    let subtotal = 0;
+    const itemValid = [];
+    const itemTidakValid = [];
+    const jumlahDipesan = {};
+
+    for (const pesananItem of pesanan) {
+      const itemMenu = this.cariMenu(pesananItem.menu);
+      if (!itemMenu) {
+        itemTidakValid.push({ menu: pesananItem.menu, alasan: "Menu tidak ditemukan" });
+        continue;
+      }
+      if (pesananItem.jumlah <= 0) {
+        itemTidakValid.push({ menu: pesananItem.menu, alasan: "Jumlah harus lebih dari 0" });
+        continue;
+      }
+
+      const sudahDiminta = jumlahDipesan[itemMenu.nama] || 0;
+      if (sudahDiminta + pesananItem.jumlah > itemMenu.stok) {
+        itemTidakValid.push({ menu: pesananItem.menu, alasan: "Stok tidak cukup" });
+        continue;
+      }
+
+      jumlahDipesan[itemMenu.nama] = sudahDiminta + pesananItem.jumlah;
+      itemValid.push({
+        menu: itemMenu.nama,
+        jumlah: pesananItem.jumlah,
+        harga: itemMenu.harga,
+      });
+      subtotal += itemMenu.harga * pesananItem.jumlah;
+    }
+
+    return { subtotal, itemValid, itemTidakValid };
+  },
+
+  hitungPromoHari(hari) {
+    let promo;
+    switch (hari) {
+      case "jumat":
+        promo = 3000;
+        break;
+      case "sabtu":
+      case "minggu":
+        promo = 5000;
+        break;
+      default:
+        promo = 0;
+        break;
+    }
+    return promo;
+  },
+
+  hitungDiskon(subtotal, persenVoucher) {
+    let persenSubtotal;
+    if (subtotal >= 100000) {
+      persenSubtotal = 15;
+    } else if (subtotal >= 50000) {
+      persenSubtotal = 10;
+    } else if (subtotal >= 25000) {
+      persenSubtotal = 5;
+    } else {
+      persenSubtotal = 0;
+    }
+    return Math.round(subtotal * Math.max(persenSubtotal, persenVoucher) / 100);
+  },
+
+  hitungPajak(nilai, tarif = 0.11) {
+    return Math.round(nilai * tarif);
+  },
+
+  hitungKembalianPecahan(kembalian) {
+    if (kembalian < 0) {
+      return null;
+    }
+
+    let sisa = kembalian;
+    const rincian = {};
+    for (const pecahan of this.pecahan) {
+      let jumlahLembar = 0;
+      while (sisa >= pecahan) {
+        sisa -= pecahan;
+        jumlahLembar++;
+      }
+      if (jumlahLembar > 0) {
+        rincian[pecahan] = jumlahLembar;
+      }
+    }
+    rincian.sisa = sisa;
+    return rincian;
+  },
+
+  prosesTransaksi(trx) {
+    const tolak = (alasan) => {
+      const hasilDitolak = {
+        kode: trx.kode,
+        pelanggan: trx.pelanggan,
+        status: "DITOLAK",
+        alasan,
+      };
+      this.riwayat.push(hasilDitolak);
+      return hasilDitolak;
+    };
+
+    if (!trx.pelanggan) {
+      return tolak("Nama pelanggan kosong");
+    }
+    if (!trx.pesanan.length) {
+      return tolak("Pesanan kosong");
+    }
+
+    const { subtotal, itemValid, itemTidakValid } = this.hitungSubtotal(trx.pesanan);
+    if (!itemValid.length) {
+      return tolak("Tidak ada item valid");
+    }
+
+    const promoHari = this.hitungPromoHari(trx.hari);
+    const diskon = this.hitungDiskon(subtotal, trx.persenVoucher);
+    const nilaiSetelahDiskon = Math.max(0, subtotal - diskon - promoHari);
+    const pajak = this.hitungPajak(nilaiSetelahDiskon);
+    const total = nilaiSetelahDiskon + pajak;
+    const kembalian = trx.uangBayar - total;
+    const status = trx.uangBayar >= total ? "LUNAS" : "KURANG";
+    let pecahanKembalian = null;
+
+    if (status === "LUNAS") {
+      for (const item of itemValid) {
+        const itemMenu = this.cariMenu(item.menu);
+        itemMenu.stok -= item.jumlah;
+      }
+      this.saldoKas += total;
+      pecahanKembalian = this.hitungKembalianPecahan(kembalian);
+    }
+
+    const hasil = {
+      kode: trx.kode,
+      pelanggan: trx.pelanggan,
+      status,
+      subtotal,
+      promoHari,
+      diskon,
+      pajak,
+      total,
+      uangBayar: trx.uangBayar,
+      kembalian,
+      pecahanKembalian,
+      itemValid,
+      itemTidakValid,
+    };
+    this.riwayat.push(hasil);
+    return hasil;
+  },
+
+  cetakStruk(hasil) {
+    console.log(`\n===== STRUK ${hasil.kode} =====`);
+    console.log(`Pelanggan: ${hasil.pelanggan || "(kosong)"}`);
+    if (hasil.status === "DITOLAK") {
+      console.log(`Transaksi ditolak: ${hasil.alasan}`);
+      console.log("===========================");
+      return;
+    }
+
+    console.log("Item valid:");
+    for (let i = 0; i < hasil.itemValid.length; i++) {
+      const item = hasil.itemValid[i];
+      console.log(`${i + 1}. ${item.menu} x${item.jumlah} @ ${formatRupiah(item.harga)}`);
+    }
+    if (hasil.itemTidakValid.length) {
+      console.log("Item tidak valid:");
+      for (const item of hasil.itemTidakValid) {
+        console.log(`- ${item.menu}: ${item.alasan}`);
+      }
+    }
+    console.log(`Subtotal: ${formatRupiah(hasil.subtotal)}`);
+    console.log(`Promo hari: ${formatRupiah(hasil.promoHari)}`);
+    console.log(`Diskon: ${formatRupiah(hasil.diskon)}`);
+    console.log(`Pajak: ${formatRupiah(hasil.pajak)}`);
+    console.log(`Total: ${formatRupiah(hasil.total)}`);
+    console.log(`Uang bayar: ${formatRupiah(hasil.uangBayar)}`);
+    console.log(`Kembalian: ${formatRupiah(hasil.kembalian)}`);
+    console.log(`Status: ${hasil.status}`);
+    if (hasil.pecahanKembalian) {
+      console.log("Pecahan kembalian:", hasil.pecahanKembalian);
+    }
+    console.log("===========================");
+  },
+};
+
+git 
