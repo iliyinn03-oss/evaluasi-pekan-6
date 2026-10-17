@@ -509,3 +509,17 @@ console.log("Salinan sesudah splice:", salinanKodeLunas);
 console.log("Array kodeLunas asli tetap:", laporan.kodeLunas);
 
 
+/*
+  Jawaban bagian 4:
+  - penjualanPerMenu adalah object karena nama menu menjadi kunci yang memetakan
+    ke jumlah penjualan; bracket notation mendukung kunci nama yang berasal dari data.
+  - Object.keys menghasilkan daftar kunci/nama menu, Object.values menghasilkan
+    daftar nilai/jumlah yang terjual; keduanya dicetak di atas.
+  - slice tidak mengubah array asli; splice mengubah salinan. Console menunjukkan
+    kodeLunas asli tetap sama sesudah salinan dipotong.
+  - toFixed mengembalikan teks. Rata-rata dibulatkan dengan Math.round agar tetap
+    berupa angka; jika string dijumlahkan dengan angka, hasilnya dapat menjadi gabungan teks.
+  - split(", ").length cocok dengan jumlahLunas karena string ringkasan menambahkan
+    satu kode untuk setiap transaksi lunas; untuk nol transaksi pun string kosong
+    menghasilkan panjang 1, sehingga pemeriksaan khusus itu akan false.
+*
