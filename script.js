@@ -412,3 +412,114 @@ console.log("\nSaldo kas:", formatRupiah(kasir.saldoKas));
 // Untuk uji kedua, ubah TARGET_KAS menjadi 50000 dan muat ulang halaman.
 // TRX-002 adalah transaksi terakhir yang diproses pada percobaan kedua.
 // Nilai TARGET_KAS dikembalikan ke 1000000000 untuk hasil akhir.
+
+// BAGIAN 4: LAPORAN HARIAN
+const laporan = {
+  jumlahTransaksi: kasir.riwayat.length,
+  jumlahLunas: 0,
+  jumlahKurang: 0,
+  jumlahDitolak: 0,
+  pendapatan: 0,
+  rataRata: 0,
+  transaksiTerbesar: null,
+  penjualanPerMenu: {},
+  menuTerlaris: "",
+  daftarDitolak: [],
+  kodeLunas: [],
+  ringkasanKodeTeks: "",
+  menuStokMenipis: [],
+};
+
+for (const hasil of kasir.riwayat) {
+  if (hasil.status === "LUNAS") {
+    laporan.jumlahLunas++;
+    laporan.pendapatan += hasil.total;
+    laporan.kodeLunas.push(hasil.kode);
+    if (!laporan.transaksiTerbesar || hasil.total > laporan.transaksiTerbesar.total) {
+      laporan.transaksiTerbesar = hasil;
+    }
+    for (const item of hasil.itemValid) {
+      if (!(item.menu in laporan.penjualanPerMenu)) {
+        laporan.penjualanPerMenu[item.menu] = 0;
+      }
+      laporan.penjualanPerMenu[item.menu] += item.jumlah;
+    }
+  } else if (hasil.status === "KURANG") {
+    laporan.jumlahKurang++;
+  } else if (hasil.status === "DITOLAK") {
+    laporan.jumlahDitolak++;
+    laporan.daftarDitolak.push({ kode: hasil.kode, alasan: hasil.alasan });
+  }
+}
+
+if (laporan.jumlahLunas > 0) {
+  laporan.rataRata = Math.round(laporan.pendapatan / laporan.jumlahLunas);
+}
+
+let jumlahTerlaris = -1;
+for (const namaMenu in laporan.penjualanPerMenu) {
+  if (laporan.penjualanPerMenu[namaMenu] > jumlahTerlaris) {
+    jumlahTerlaris = laporan.penjualanPerMenu[namaMenu];
+    laporan.menuTerlaris = namaMenu;
+  }
+}
+
+for (const item of kasir.menu) {
+  if (item.stok < 3) {
+    laporan.menuStokMenipis.push(item.nama);
+  }
+}
+
+for (const kode of laporan.kodeLunas) {
+  if (laporan.ringkasanKodeTeks) {
+    laporan.ringkasanKodeTeks += ", ";
+  }
+  laporan.ringkasanKodeTeks += kode;
+}
+
+console.log(`\n===== ${kedai.nama.toUpperCase()} =====`);
+console.log("LAPORAN HARIAN");
+console.log(`Jumlah transaksi: ${laporan.jumlahTransaksi}`);
+console.log(`Lunas: ${laporan.jumlahLunas} | Kurang: ${laporan.jumlahKurang} | Ditolak: ${laporan.jumlahDitolak}`);
+console.log(`Pendapatan: ${formatRupiah(laporan.pendapatan)}`);
+console.log(`Rata-rata transaksi lunas: ${formatRupiah(laporan.rataRata)}`);
+console.log(`Transaksi terbesar: ${laporan.transaksiTerbesar ? laporan.transaksiTerbesar.kode : "Tidak ada"}`);
+console.log(`Menu terlaris: ${laporan.menuTerlaris || "Tidak ada"}`);
+console.log("Penjualan per menu:");
+for (const namaMenu in laporan.penjualanPerMenu) {
+  console.log(`- ${namaMenu}: ${laporan.penjualanPerMenu[namaMenu]}`);
+}
+console.log("Object.keys:", Object.keys(laporan.penjualanPerMenu));
+console.log("Object.values:", Object.values(laporan.penjualanPerMenu));
+console.log("Transaksi ditolak:", laporan.daftarDitolak);
+console.log("Menu stok menipis:", laporan.menuStokMenipis);
+console.log(`Kode lunas: ${laporan.ringkasanKodeTeks}`);
+console.log(
+  "Jumlah kode cocok:",
+  laporan.ringkasanKodeTeks.split(", ").length === laporan.jumlahLunas,
+);
+
+const salinanKodeLunas = laporan.kodeLunas.slice();
+console.log("includes TRX-001:", laporan.kodeLunas.includes("TRX-001"));
+console.log("indexOf TRX-002:", laporan.kodeLunas.indexOf("TRX-002"));
+console.log("Dua kode pertama:", laporan.kodeLunas.slice(0, 2));
+console.log("Salinan sebelum splice:", salinanKodeLunas);
+salinanKodeLunas.splice(0, 1);
+console.log("Salinan sesudah splice:", salinanKodeLunas);
+console.log("Array kodeLunas asli tetap:", laporan.kodeLunas);
+
+
+/*
+  Jawaban bagian 4:
+  - penjualanPerMenu adalah object karena nama menu menjadi kunci yang memetakan
+    ke jumlah penjualan; bracket notation mendukung kunci nama yang berasal dari data.
+  - Object.keys menghasilkan daftar kunci/nama menu, Object.values menghasilkan
+    daftar nilai/jumlah yang terjual; keduanya dicetak di atas.
+  - slice tidak mengubah array asli; splice mengubah salinan. Console menunjukkan
+    kodeLunas asli tetap sama sesudah salinan dipotong.
+  - toFixed mengembalikan teks. Rata-rata dibulatkan dengan Math.round agar tetap
+    berupa angka; jika string dijumlahkan dengan angka, hasilnya dapat menjadi gabungan teks.
+  - split(", ").length cocok dengan jumlahLunas karena string ringkasan menambahkan
+    satu kode untuk setiap transaksi lunas; untuk nol transaksi pun string kosong
+    menghasilkan panjang 1, sehingga pemeriksaan khusus itu akan false.
+*
