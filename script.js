@@ -412,4 +412,3 @@ console.log("\nSaldo kas:", formatRupiah(kasir.saldoKas));
 // Untuk uji kedua, ubah TARGET_KAS menjadi 50000 dan muat ulang halaman.
 // TRX-002 adalah transaksi terakhir yang diproses pada percobaan kedua.
 // Nilai TARGET_KAS dikembalikan ke 1000000000 untuk hasil akhir.
-//
