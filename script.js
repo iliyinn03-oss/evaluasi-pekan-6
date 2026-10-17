@@ -522,4 +522,4 @@ console.log("Array kodeLunas asli tetap:", laporan.kodeLunas);
   - split(", ").length cocok dengan jumlahLunas karena string ringkasan menambahkan
     satu kode untuk setiap transaksi lunas; untuk nol transaksi pun string kosong
     menghasilkan panjang 1, sehingga pemeriksaan khusus itu akan false.
-*
+*/
