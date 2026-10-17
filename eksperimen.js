@@ -85,3 +85,50 @@ for (let huruf of "ABC") {
 }
 // Hasil asli Potongan C sama dengan tebakan di atas.
 
+// BAGIAN 7.2: EKSPERIMEN
+console.log("Declaration sebelum definisi:", deklarasiBisaDiangkat());
+function deklarasiBisaDiangkat() {
+  return "function declaration";
+}
+
+const functionExpression = function () {
+  return "function expression";
+};
+console.log("Function expression setelah inisialisasi:", functionExpression());
+// Jika dipindah sebelum deklarasi const, pesan: ReferenceError:
+// Cannot access 'functionExpression' before initialization.
+// console.log(functionExpression());
+
+const arrayPercobaan = [1, 2, 3, 4];
+const hasilSlice = arrayPercobaan.slice(1, 3);
+console.log("slice:", hasilSlice, "| asli:", arrayPercobaan);
+const hasilSplice = arrayPercobaan.splice(1, 2);
+console.log("splice:", hasilSplice, "| array sesudah splice:", arrayPercobaan);
+
+const hurufArray = ["a", "b", "c"];
+for (const indeks in hurufArray) {
+  console.log("for...in indeks (teks):", indeks, typeof indeks);
+}
+for (const nilai of hurufArray) {
+  console.log("for...of nilai:", nilai);
+}
+
+const gabunganToFixed = (5).toFixed(1) + 1;
+console.log("(5).toFixed(1):", (5).toFixed(1), typeof (5).toFixed(1));
+console.log("(5).toFixed(1) + 1:", gabunganToFixed);
+
+const nilaiFalsy = [false, 0, "", null, undefined, NaN];
+for (const nilai of nilaiFalsy) {
+  if (nilai) {
+    console.log("Falsy masuk if:", nilai);
+  } else {
+    console.log("Falsy tidak masuk if:", String(nilai));
+  }
+}
+const nilaiTruthy = ["0", [], {}];
+for (const nilai of nilaiTruthy) {
+  if (nilai) {
+    console.log("Truthy masuk if:", nilai);
+  }
+}
+
